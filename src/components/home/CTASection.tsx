@@ -29,12 +29,12 @@ const CTASection = () => {
               Create an Account
             </ButtonLink>
             <ButtonLink 
-              to="/doctors" 
+              to="/symptom-checker" 
               size="xl" 
               variant="outline"
               className="bg-transparent border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
             >
-              Browse Our Doctors
+              Try Our AI Symptom Checker
             </ButtonLink>
           </div>
         </div>
