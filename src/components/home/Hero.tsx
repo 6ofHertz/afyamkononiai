@@ -63,7 +63,7 @@ const Hero = () => {
               
               <div className="relative z-10">
                 <img 
-                  src="https://images.unsplash.com/photo-1584516150877-6510fb605783?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  src="https://images.unsplash.com/photo-1633283618052-67bc6e502372?w=800&auto=format&fit=crop&q=80" 
                   alt="Doctor caring for mother and child" 
                   className="rounded-2xl shadow-lg w-full h-auto aspect-square object-cover"
                 />

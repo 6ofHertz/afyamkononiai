@@ -49,7 +49,7 @@ const AIFeature = () => {
             
             <div className="relative z-10">
               <img 
-                src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                src="https://images.unsplash.com/photo-1536064479547-7ee40b74b807?w=800&auto=format&fit=crop&q=80" 
                 alt="AI-powered healthcare" 
                 className="rounded-2xl shadow-lg w-full h-auto aspect-video object-cover"
               />

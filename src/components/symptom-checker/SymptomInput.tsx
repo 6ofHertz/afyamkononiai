@@ -11,12 +11,12 @@ interface SymptomInputProps {
 }
 
 const SymptomInput = ({ userInput, setUserInput, handleSubmit, isLoading }: SymptomInputProps) => {
-  // Examples to help users describe their symptoms
+  // More detailed examples to help users describe their symptoms
   const examplePrompts = [
-    "I've had a fever of 38.5°C for the past two days, with a dry cough and fatigue.",
-    "My 3-year-old has developed a rash on their arms that's itchy and slightly raised.",
-    "I've been experiencing severe headaches, mostly on one side, with sensitivity to light.",
-    "My baby (8 months) has been unusually fussy and pulling at their ear."
+    "I've had a fever of 38.5°C for the past two days, with a dry cough, body aches, and fatigue. I've been taking paracetamol but it only helps temporarily.",
+    "My 3-year-old has developed a rash on their arms and torso that's itchy and slightly raised with reddish bumps. It started after we tried a new laundry detergent.",
+    "I've been experiencing severe headaches, mostly on one side, with sensitivity to light and sound. They last about 8 hours and I sometimes feel nauseous during episodes.",
+    "I'm 10 weeks pregnant and experiencing severe morning sickness. I've been vomiting 3-4 times daily and struggling to keep food down for the past week."
   ];
 
   const handleExampleClick = (example: string) => {
@@ -28,7 +28,7 @@ const SymptomInput = ({ userInput, setUserInput, handleSubmit, isLoading }: Symp
       <div className="space-y-2">
         <Textarea
           id="symptoms"
-          placeholder="Describe your symptoms in detail... Include information like when they started, severity, and any other relevant details."
+          placeholder="Describe your symptoms in detail... Include information like when they started, severity, duration, any triggers, what makes them better or worse, and any relevant medical history."
           className="min-h-32 resize-y"
           value={userInput}
           onChange={(e) => setUserInput(e.target.value)}
