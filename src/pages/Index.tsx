@@ -4,6 +4,7 @@ import Footer from "@/components/layout/Footer";
 import Hero from "@/components/home/Hero";
 import Features from "@/components/home/Features";
 import Services from "@/components/home/Services";
+import AIFeature from "@/components/home/AIFeature";
 import CTASection from "@/components/home/CTASection";
 
 const Index = () => {
@@ -13,6 +14,7 @@ const Index = () => {
       <main className="flex-1">
         <Hero />
         <Features />
+        <AIFeature />
         <Services />
         <CTASection />
       </main>

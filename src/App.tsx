@@ -13,6 +13,7 @@ import Doctors from "./pages/Doctors";
 import Contact from "./pages/Contact";
 import PatientDashboard from "./pages/PatientDashboard";
 import DoctorDashboard from "./pages/DoctorDashboard";
+import SymptomChecker from "./pages/SymptomChecker";
 import NotFound from "./pages/NotFound";
 import { useState } from "react";
 
@@ -36,6 +37,7 @@ const App = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/patient-dashboard" element={<PatientDashboard />} />
             <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+            <Route path="/symptom-checker" element={<SymptomChecker />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

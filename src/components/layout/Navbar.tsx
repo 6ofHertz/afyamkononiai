@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Brain } from "lucide-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -31,6 +31,10 @@ const Navbar = () => {
           </Link>
           <Link to="/doctors" className="text-sm font-medium hover:text-primary transition-colors">
             Doctors
+          </Link>
+          <Link to="/symptom-checker" className="text-sm font-medium hover:text-primary transition-colors flex items-center">
+            <Brain className="mr-1 h-3.5 w-3.5" />
+            AI Symptom Checker
           </Link>
           <Link to="/about" className="text-sm font-medium hover:text-primary transition-colors">
             About
@@ -82,6 +86,14 @@ const Navbar = () => {
               Doctors
             </Link>
             <Link
+              to="/symptom-checker"
+              className="px-2 py-1 text-sm font-medium hover:text-primary transition-colors flex items-center"
+              onClick={toggleMenu}
+            >
+              <Brain className="mr-1 h-3.5 w-3.5" />
+              AI Symptom Checker
+            </Link>
+            <Link
               to="/about"
               className="px-2 py-1 text-sm font-medium hover:text-primary transition-colors"
               onClick={toggleMenu}
@@ -96,10 +108,10 @@ const Navbar = () => {
               Contact
             </Link>
             <div className="flex flex-col space-y-2 pt-2 border-t">
-              <ButtonLink to="/login" variant="ghost" className="justify-center w-full">
+              <ButtonLink to="/login" variant="ghost" className="justify-center w-full" onClick={toggleMenu}>
                 Login
               </ButtonLink>
-              <ButtonLink to="/register" variant="default" className="justify-center w-full">
+              <ButtonLink to="/register" variant="default" className="justify-center w-full" onClick={toggleMenu}>
                 Register
               </ButtonLink>
             </div>
