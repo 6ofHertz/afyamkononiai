@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { ButtonLink } from "@/components/ui/button-link";
@@ -142,7 +141,7 @@ const Services = () => {
                   </li>
                 </ul>
                 
-                <ButtonLink to="/services/pediatric" variant="accent" className="mt-8">
+                <ButtonLink to="/services/pediatric" variant="secondary" className="mt-8">
                   Learn More About Pediatric Services
                 </ButtonLink>
               </div>
