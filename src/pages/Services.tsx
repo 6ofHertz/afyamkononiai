@@ -41,7 +41,7 @@ const Services = () => {
               </div>
               <div className="bg-muted rounded-2xl overflow-hidden">
                 <img 
-                  src="https://images.unsplash.com/photo-1516018849628-fb4241bb556c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  src="https://images.unsplash.com/photo-1590650153855-d9e808231d41?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
                   alt="Doctor consulting with a mother and child" 
                   className="w-full h-auto"
                 />
@@ -57,7 +57,7 @@ const Services = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                   <div className="bg-muted rounded-2xl overflow-hidden">
                     <img 
-                      src="https://images.unsplash.com/photo-1516685153223-595e5372973f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                      src="https://images.unsplash.com/photo-1631568074929-215ea88a0f5e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
                       alt="Pregnant woman at consultation" 
                       className="w-full h-full object-cover"
                     />
@@ -150,7 +150,7 @@ const Services = () => {
                   </div>
                   <div className="bg-muted rounded-2xl overflow-hidden">
                     <img 
-                      src="https://images.unsplash.com/photo-1566004100631-35d015d6a99b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                      src="https://images.unsplash.com/photo-1584515933487-779824d29309?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
                       alt="Doctor examining a child" 
                       className="w-full h-full object-cover"
                     />

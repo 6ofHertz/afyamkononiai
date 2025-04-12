@@ -9,28 +9,28 @@ const services = [
     title: "Maternal Health",
     description: "Comprehensive care for expectant and new mothers, including prenatal and postnatal consultations, nutrition guidance, and mental health support.",
     link: "/services/maternal",
-    image: "https://images.unsplash.com/photo-1607207686445-80b1a5096908?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    image: "https://images.unsplash.com/photo-1609220136736-443140cffec6?w=800&auto=format&fit=crop&q=80"
   },
   {
     icon: <Baby className="h-12 w-12 text-primary" />,
     title: "Pediatric Care",
     description: "Specialized healthcare for infants and children, including wellness checks, developmental assessments, and management of common childhood illnesses.",
     link: "/services/pediatric",
-    image: "https://images.unsplash.com/photo-1574887427561-d3d5d58c9273?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    image: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=800&auto=format&fit=crop&q=80"
   },
   {
     icon: <Stethoscope className="h-12 w-12 text-primary" />,
     title: "Specialist Consultations",
     description: "Connect with pediatricians, obstetricians, gynecologists, and other specialists for expert medical advice and treatment plans.",
     link: "/services/specialists",
-    image: "https://images.unsplash.com/photo-1622902046580-2b47f47f5471?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    image: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=800&auto=format&fit=crop&q=80"
   },
   {
     icon: <CalendarClock className="h-12 w-12 text-primary" />,
     title: "Follow-up Care",
     description: "Regular follow-up appointments to monitor health progress, adjust treatment plans, and ensure optimal recovery and development.",
     link: "/services/followup",
-    image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+    image: "https://images.unsplash.com/photo-1632053001332-a14c6c624f3d?w=800&auto=format&fit=crop&q=80"
   }
 ];
 

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -14,7 +15,7 @@ import {
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { StarIcon, MapPin, Calendar } from "lucide-react";
 
-// Updated doctor data with more diverse representation
+// Updated doctor data with more diverse representation and matching names/genders
 const doctorsData = [
   {
     id: 1,
@@ -48,12 +49,12 @@ const doctorsData = [
   },
   {
     id: 4,
-    name: "Dr. Daniel Muthui",
+    name: "Dr. David Muthui",
     specialty: "Neonatology",
     experience: "10 years",
     rating: 4.6,
     location: "Nakuru, Kenya",
-    image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=800&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1622902046580-2b47f47f5471?w=800&auto=format&fit=crop&q=80",
     availability: "Available in 2 days",
   },
   {
