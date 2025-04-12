@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AlertCircle, Info, ArrowRight, BadgeCheck, RefreshCw, Heart, ShieldAlert, CalendarCheck } from "lucide-react";
+import { AlertCircle, Info, ArrowRight, BadgeCheck, RefreshCw } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button-link";
 
 interface AIResponseProps {
@@ -10,9 +10,6 @@ interface AIResponseProps {
     urgencyLevel: "low" | "medium" | "high";
     possibleConditions: string[];
     nextSteps: string[];
-    medicalAdvice?: string;
-    preventiveMeasures?: string[];
-    followUpRecommendations?: string;
   };
   resetForm: () => void;
 }
@@ -80,19 +77,6 @@ const AIResponse = ({ aiResponse, resetForm }: AIResponseProps) => {
         </div>
       </div>
 
-      {/* Medical Advice */}
-      {aiResponse.medicalAdvice && (
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <div className="flex items-start gap-3">
-            <Heart className="h-5 w-5 text-blue-600 mt-1 flex-shrink-0" />
-            <div>
-              <h3 className="font-medium text-lg mb-2 text-blue-800">Medical Information</h3>
-              <p className="text-sm text-blue-800">{aiResponse.medicalAdvice}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Next steps */}
       <div>
         <h3 className="font-medium text-lg mb-2">Recommended Next Steps</h3>
@@ -105,39 +89,6 @@ const AIResponse = ({ aiResponse, resetForm }: AIResponseProps) => {
           ))}
         </ul>
       </div>
-
-      {/* Preventive Measures */}
-      {aiResponse.preventiveMeasures && (
-        <div>
-          <h3 className="font-medium text-lg mb-2 flex items-center gap-2">
-            <ShieldAlert className="h-5 w-5 text-primary" />
-            Preventive Measures
-          </h3>
-          <ul className="space-y-2">
-            {aiResponse.preventiveMeasures.map((measure, index) => (
-              <li key={index} className="flex items-start gap-2">
-                <div className="rounded-full bg-primary/10 p-1 mt-0.5 flex-shrink-0">
-                  <BadgeCheck className="h-4 w-4 text-primary" />
-                </div>
-                <span>{measure}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Follow-up Recommendations */}
-      {aiResponse.followUpRecommendations && (
-        <div className="bg-secondary/50 p-4 rounded-lg border border-border">
-          <div className="flex items-start gap-3">
-            <CalendarCheck className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-            <div>
-              <h3 className="font-medium mb-1">Follow-up Recommendations</h3>
-              <p className="text-sm">{aiResponse.followUpRecommendations}</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Actions */}
       <div className="pt-4 flex flex-wrap gap-4">

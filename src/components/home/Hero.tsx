@@ -57,22 +57,24 @@ const Hero = () => {
           </div>
           
           <div className="relative">
-            <div className="absolute -top-4 -left-4 w-24 h-24 bg-accent/20 rounded-full filter blur-xl animate-float"></div>
-            <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-primary/20 rounded-full filter blur-xl"></div>
-            
-            <div className="relative z-10">
-              <img 
-                src="https://images.unsplash.com/photo-1611042553365-9b101441c135?w=800&auto=format&fit=crop&q=80" 
-                alt="Doctor caring for mother and child" 
-                className="rounded-2xl shadow-lg w-full h-auto aspect-square object-cover"
-              />
+            <div className="relative">
+              <div className="absolute -top-4 -left-4 w-24 h-24 bg-accent/20 rounded-full filter blur-xl animate-float"></div>
+              <div className="absolute -bottom-8 -right-8 w-40 h-40 bg-primary/20 rounded-full filter blur-xl"></div>
               
-              <div className="absolute -bottom-6 -right-6 bg-white rounded-lg shadow-lg p-4 max-w-xs">
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="h-3 w-3 bg-green-500 rounded-full"></div>
-                  <p className="font-medium text-sm">Available Now</p>
+              <div className="relative z-10">
+                <img 
+                  src="https://images.unsplash.com/photo-1584516150877-6510fb605783?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
+                  alt="Doctor caring for mother and child" 
+                  className="rounded-2xl shadow-lg w-full h-auto aspect-square object-cover"
+                />
+                
+                <div className="absolute -bottom-6 -right-6 bg-white rounded-lg shadow-lg p-4 max-w-xs">
+                  <div className="flex items-center space-x-3 mb-2">
+                    <div className="h-3 w-3 bg-green-500 rounded-full"></div>
+                    <p className="font-medium text-sm">Available Now</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Our specialists are ready to help you with immediate consultations</p>
                 </div>
-                <p className="text-xs text-muted-foreground">Our specialists are ready to help you with immediate consultations</p>
               </div>
             </div>
           </div>

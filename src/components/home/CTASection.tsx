@@ -22,15 +22,15 @@ const CTASection = () => {
           <div className="flex flex-wrap justify-center gap-4">
             <ButtonLink 
               to="/register" 
-              size="lg"
-              variant="default"
-              className="font-semibold text-lg px-8 py-3"
+              size="xl" 
+              variant="accent"
+              className="font-semibold"
             >
               Create an Account
             </ButtonLink>
             <ButtonLink 
               to="/doctors" 
-              size="lg"
+              size="xl" 
               variant="outline"
               className="bg-transparent border-primary-foreground/20 text-primary-foreground hover:bg-primary-foreground/10"
             >
