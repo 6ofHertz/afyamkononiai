@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ButtonLink } from "@/components/ui/button-link";
+import BackgroundSlideshow from "@/components/layout/BackgroundSlideshow";
+import { loginImages } from "@/lib/slideshow-images";
 
 const Login = () => {
   const { toast } = useToast();
@@ -43,126 +45,128 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      
-      <div className="flex-1 flex items-center justify-center py-16 px-4 bg-secondary/50">
-        <div className="w-full max-w-md">
-          <Tabs defaultValue="patient" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 w-full mb-8">
-              <TabsTrigger value="patient">Patient Login</TabsTrigger>
-              <TabsTrigger value="doctor">Medical Professional</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="patient">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Patient Login</CardTitle>
-                  <CardDescription>
-                    Access your health records, appointments, and consultations.
-                  </CardDescription>
-                </CardHeader>
-                <form onSubmit={handlePatientLogin}>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="patient-email">Email</Label>
-                      <Input 
-                        id="patient-email" 
-                        type="email" 
-                        placeholder="name@example.com"
-                        value={patientEmail}
-                        onChange={(e) => setPatientEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="patient-password">Password</Label>
-                        <Link to="/forgot-password" className="text-xs text-primary hover:underline">
-                          Forgot password?
+    <BackgroundSlideshow images={loginImages}>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        
+        <div className="flex-1 flex items-center justify-center py-16 px-4">
+          <div className="w-full max-w-md">
+            <Tabs defaultValue="patient" value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid grid-cols-2 w-full mb-8">
+                <TabsTrigger value="patient">Patient Login</TabsTrigger>
+                <TabsTrigger value="doctor">Medical Professional</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="patient">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Patient Login</CardTitle>
+                    <CardDescription>
+                      Access your health records, appointments, and consultations.
+                    </CardDescription>
+                  </CardHeader>
+                  <form onSubmit={handlePatientLogin}>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="patient-email">Email</Label>
+                        <Input 
+                          id="patient-email" 
+                          type="email" 
+                          placeholder="name@example.com"
+                          value={patientEmail}
+                          onChange={(e) => setPatientEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="patient-password">Password</Label>
+                          <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                            Forgot password?
+                          </Link>
+                        </div>
+                        <Input 
+                          id="patient-password" 
+                          type="password" 
+                          value={patientPassword}
+                          onChange={(e) => setPatientPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex flex-col space-y-4">
+                      <Button type="submit" className="w-full">
+                        Sign in
+                      </Button>
+                      <div className="text-center text-sm">
+                        Don&apos;t have an account?{" "}
+                        <Link to="/register" className="text-primary hover:underline">
+                          Sign up
                         </Link>
                       </div>
-                      <Input 
-                        id="patient-password" 
-                        type="password" 
-                        value={patientPassword}
-                        onChange={(e) => setPatientPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex flex-col space-y-4">
-                    <Button type="submit" className="w-full">
-                      Sign in
-                    </Button>
-                    <div className="text-center text-sm">
-                      Don&apos;t have an account?{" "}
-                      <Link to="/register" className="text-primary hover:underline">
-                        Sign up
-                      </Link>
-                    </div>
-                  </CardFooter>
-                </form>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="doctor">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Healthcare Provider Login</CardTitle>
-                  <CardDescription>
-                    Access your patient records, appointments, and consultation platform.
-                  </CardDescription>
-                </CardHeader>
-                <form onSubmit={handleDoctorLogin}>
-                  <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="doctor-email">Email</Label>
-                      <Input 
-                        id="doctor-email" 
-                        type="email" 
-                        placeholder="name@example.com"
-                        value={doctorEmail}
-                        onChange={(e) => setDoctorEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="doctor-password">Password</Label>
-                        <Link to="/forgot-password" className="text-xs text-primary hover:underline">
-                          Forgot password?
+                    </CardFooter>
+                  </form>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="doctor">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Healthcare Provider Login</CardTitle>
+                    <CardDescription>
+                      Access your patient records, appointments, and consultation platform.
+                    </CardDescription>
+                  </CardHeader>
+                  <form onSubmit={handleDoctorLogin}>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="doctor-email">Email</Label>
+                        <Input 
+                          id="doctor-email" 
+                          type="email" 
+                          placeholder="name@example.com"
+                          value={doctorEmail}
+                          onChange={(e) => setDoctorEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="doctor-password">Password</Label>
+                          <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                            Forgot password?
+                          </Link>
+                        </div>
+                        <Input 
+                          id="doctor-password" 
+                          type="password" 
+                          value={doctorPassword}
+                          onChange={(e) => setDoctorPassword(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </CardContent>
+                    <CardFooter className="flex flex-col space-y-4">
+                      <Button type="submit" className="w-full">
+                        Sign in
+                      </Button>
+                      <div className="text-center text-sm">
+                        Are you a new healthcare provider?{" "}
+                        <Link to="/doctor-register" className="text-primary hover:underline">
+                          Join our network
                         </Link>
                       </div>
-                      <Input 
-                        id="doctor-password" 
-                        type="password" 
-                        value={doctorPassword}
-                        onChange={(e) => setDoctorPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex flex-col space-y-4">
-                    <Button type="submit" className="w-full">
-                      Sign in
-                    </Button>
-                    <div className="text-center text-sm">
-                      Are you a new healthcare provider?{" "}
-                      <Link to="/doctor-register" className="text-primary hover:underline">
-                        Join our network
-                      </Link>
-                    </div>
-                  </CardFooter>
-                </form>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                    </CardFooter>
+                  </form>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
-      </div>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </BackgroundSlideshow>
   );
 };
 

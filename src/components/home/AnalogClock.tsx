@@ -40,7 +40,7 @@ const AnalogClock = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center mx-auto">
+      <div className="relative w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-white/90 shadow-lg border border-gray-200 flex items-center justify-center mx-auto backdrop-blur-sm">
         {/* Clock face */}
         <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white to-gray-100 flex items-center justify-center">
           {/* Hour markers */}
@@ -94,7 +94,7 @@ const AnalogClock = () => {
 
       {/* Digital time display */}
       <div className="mt-4 text-center">
-        <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-4 py-2 font-mono text-lg font-medium">
+        <div className="bg-white/80 backdrop-blur-sm border border-gray-200 rounded-lg shadow-sm px-4 py-2 font-mono text-lg font-medium">
           {formatDigitalTime()}
         </div>
         <button 

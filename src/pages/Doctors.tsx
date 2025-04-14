@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { StarIcon, MapPin, Calendar } from "lucide-react";
+import BackgroundSlideshow from "@/components/layout/BackgroundSlideshow";
+import { doctorsImages } from "@/lib/slideshow-images";
 
 // Sample doctor data
 const doctorsData = [
@@ -117,94 +119,96 @@ const Doctors = () => {
   const specialties = Array.from(new Set(doctorsData.map(d => d.specialty)));
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navbar />
-      <main className="flex-1">
-        {/* Hero Section */}
-        <section className="py-16 bg-gradient-to-b from-background to-secondary">
-          <div className="container max-w-screen-xl px-4">
-            <div className="max-w-3xl mx-auto text-center">
-              <h1 className="heading-2 mb-6">Find the Right Specialist</h1>
-              <p className="text-lg text-muted-foreground mb-8">
-                Connect with our highly qualified doctors specializing in maternal and child healthcare
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="col-span-1 md:col-span-2">
-                  <div className="relative">
-                    <Input
-                      type="search"
-                      placeholder="Search by name or specialty..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pr-10"
-                    />
+    <BackgroundSlideshow images={doctorsImages}>
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1">
+          {/* Hero Section */}
+          <section className="py-16 bg-gradient-to-b from-background/80 to-secondary/50 backdrop-blur-sm">
+            <div className="container max-w-screen-xl px-4">
+              <div className="max-w-3xl mx-auto text-center">
+                <h1 className="heading-2 mb-6">Find the Right Specialist</h1>
+                <p className="text-lg text-muted-foreground mb-8">
+                  Connect with our highly qualified doctors specializing in maternal and child healthcare
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="col-span-1 md:col-span-2">
+                    <div className="relative">
+                      <Input
+                        type="search"
+                        placeholder="Search by name or specialty..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pr-10 bg-card/80 backdrop-blur-sm"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <Select value={specialty} onValueChange={setSpecialty}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Specialty" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Specialties</SelectItem>
-                      {specialties.map((s) => (
-                        <SelectItem key={s} value={s}>{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div>
+                    <Select value={specialty} onValueChange={setSpecialty}>
+                      <SelectTrigger className="bg-card/80 backdrop-blur-sm">
+                        <SelectValue placeholder="Select Specialty" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Specialties</SelectItem>
+                        {specialties.map((s) => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* Doctors List */}
-        <section className="py-16">
-          <div className="container max-w-screen-xl px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredDoctors.length > 0 ? (
-                filteredDoctors.map((doctor) => (
-                  <Card key={doctor.id} className="overflow-hidden">
-                    <div className="aspect-[5/3] relative">
-                      <img 
-                        src={doctor.image} 
-                        alt={doctor.name} 
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
-                        {doctor.availability}
+          {/* Doctors List */}
+          <section className="py-16">
+            <div className="container max-w-screen-xl px-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredDoctors.length > 0 ? (
+                  filteredDoctors.map((doctor) => (
+                    <Card key={doctor.id} className="overflow-hidden bg-card/90 backdrop-blur-sm">
+                      <div className="aspect-[5/3] relative">
+                        <img 
+                          src={doctor.image} 
+                          alt={doctor.name} 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-medium px-2 py-1 rounded">
+                          {doctor.availability}
+                        </div>
                       </div>
-                    </div>
-                    <CardContent className="pt-6">
-                      <h3 className="text-xl font-semibold mb-1">{doctor.name}</h3>
-                      <p className="text-primary mb-2">{doctor.specialty}</p>
-                      <div className="flex items-center text-sm text-muted-foreground mb-3">
-                        <MapPin className="w-4 h-4 mr-1" /> {doctor.location}
-                      </div>
-                      <RatingStars rating={doctor.rating} />
-                      <p className="mt-3 text-sm">Experience: {doctor.experience}</p>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <Button variant="outline" size="sm">View Profile</Button>
-                      <Button size="sm">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        Book Appointment
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))
-              ) : (
-                <div className="col-span-full text-center py-16">
-                  <p className="text-lg text-muted-foreground">No doctors match your search criteria. Try adjusting your filters.</p>
-                </div>
-              )}
+                      <CardContent className="pt-6">
+                        <h3 className="text-xl font-semibold mb-1">{doctor.name}</h3>
+                        <p className="text-primary mb-2">{doctor.specialty}</p>
+                        <div className="flex items-center text-sm text-muted-foreground mb-3">
+                          <MapPin className="w-4 h-4 mr-1" /> {doctor.location}
+                        </div>
+                        <RatingStars rating={doctor.rating} />
+                        <p className="mt-3 text-sm">Experience: {doctor.experience}</p>
+                      </CardContent>
+                      <CardFooter className="flex justify-between">
+                        <Button variant="outline" size="sm">View Profile</Button>
+                        <Button size="sm">
+                          <Calendar className="w-4 h-4 mr-2" />
+                          Book Appointment
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-16 bg-card/80 backdrop-blur-sm rounded-lg">
+                    <p className="text-lg text-muted-foreground">No doctors match your search criteria. Try adjusting your filters.</p>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+          </section>
+        </main>
+        <Footer />
+      </div>
+    </BackgroundSlideshow>
   );
 };
 
