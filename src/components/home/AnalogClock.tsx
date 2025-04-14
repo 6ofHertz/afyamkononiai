@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 const AnalogClock = () => {
   const [time, setTime] = useState(new Date());
+  const [is24Hour, setIs24Hour] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -22,61 +23,86 @@ const AnalogClock = () => {
   const minuteDegrees = minutes * 6;
   const secondDegrees = seconds * 6;
 
+  // Format time for digital display
+  const formatDigitalTime = () => {
+    const options: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: !is24Hour
+    };
+    return time.toLocaleTimeString([], options);
+  };
+
+  const toggleTimeFormat = () => {
+    setIs24Hour(prev => !prev);
+  };
+
   return (
-    <div className="relative w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center mx-auto">
-      {/* Clock face */}
-      <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white to-gray-100 flex items-center justify-center">
-        {/* Hour markers */}
-        {[...Array(12)].map((_, i) => (
+    <div className="flex flex-col items-center">
+      <div className="relative w-32 h-32 sm:w-48 sm:h-48 rounded-full bg-white shadow-lg border border-gray-200 flex items-center justify-center mx-auto">
+        {/* Clock face */}
+        <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white to-gray-100 flex items-center justify-center">
+          {/* Hour markers */}
+          {[...Array(12)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-3 bg-gray-800"
+              style={{
+                transform: `rotate(${i * 30}deg) translateY(-21px) sm:translateY(-45px)`,
+                top: "50%",
+                left: "calc(50% - 0.5px)",
+                transformOrigin: "bottom",
+              }}
+            />
+          ))}
+
+          {/* Center dot */}
+          <div className="absolute w-3 h-3 bg-primary rounded-full z-10"></div>
+
+          {/* Hour hand */}
           <div
-            key={i}
-            className="absolute w-1 h-3 bg-gray-800"
+            className="absolute w-1.5 h-10 sm:h-16 bg-gray-800 rounded-full origin-bottom"
             style={{
-              transform: `rotate(${i * 30}deg) translateY(-21px) sm:translateY(-45px)`,
-              top: "50%",
-              left: "calc(50% - 0.5px)",
-              transformOrigin: "bottom",
+              transform: `rotate(${hourDegrees}deg)`,
+              transformOrigin: "bottom center",
+              bottom: "50%",
             }}
-          />
-        ))}
+          ></div>
 
-        {/* Center dot */}
-        <div className="absolute w-3 h-3 bg-primary rounded-full z-10"></div>
+          {/* Minute hand */}
+          <div
+            className="absolute w-1 h-14 sm:h-20 bg-gray-600 rounded-full origin-bottom"
+            style={{
+              transform: `rotate(${minuteDegrees}deg)`,
+              transformOrigin: "bottom center",
+              bottom: "50%",
+            }}
+          ></div>
 
-        {/* Hour hand */}
-        <div
-          className="absolute w-1.5 h-10 sm:h-16 bg-gray-800 rounded-full origin-bottom"
-          style={{
-            transform: `rotate(${hourDegrees}deg)`,
-            transformOrigin: "bottom center",
-            bottom: "50%",
-          }}
-        ></div>
-
-        {/* Minute hand */}
-        <div
-          className="absolute w-1 h-14 sm:h-20 bg-gray-600 rounded-full origin-bottom"
-          style={{
-            transform: `rotate(${minuteDegrees}deg)`,
-            transformOrigin: "bottom center",
-            bottom: "50%",
-          }}
-        ></div>
-
-        {/* Second hand */}
-        <div
-          className="absolute w-0.5 h-16 sm:h-22 bg-primary rounded-full origin-bottom"
-          style={{
-            transform: `rotate(${secondDegrees}deg)`,
-            transformOrigin: "bottom center",
-            bottom: "50%",
-          }}
-        ></div>
+          {/* Second hand */}
+          <div
+            className="absolute w-0.5 h-16 sm:h-22 bg-primary rounded-full origin-bottom"
+            style={{
+              transform: `rotate(${secondDegrees}deg)`,
+              transformOrigin: "bottom center",
+              bottom: "50%",
+            }}
+          ></div>
+        </div>
       </div>
 
-      {/* Current time text */}
-      <div className="absolute -bottom-8 left-0 right-0 text-center text-sm font-medium">
-        {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      {/* Digital time display */}
+      <div className="mt-4 text-center">
+        <div className="bg-white border border-gray-200 rounded-lg shadow-sm px-4 py-2 font-mono text-lg font-medium">
+          {formatDigitalTime()}
+        </div>
+        <button 
+          onClick={toggleTimeFormat}
+          className="mt-2 text-xs text-primary hover:underline"
+        >
+          Switch to {is24Hour ? "12-hour" : "24-hour"} format
+        </button>
       </div>
     </div>
   );
