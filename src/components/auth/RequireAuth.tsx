@@ -18,7 +18,7 @@ const RequireAuth = ({ children }: RequireAuthProps) => {
     }
   }, [user, loading, navigate]);
 
-  // Show nothing while checking authentication status
+  // Show loading state while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

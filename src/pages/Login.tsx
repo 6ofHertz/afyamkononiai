@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,17 +13,29 @@ import { useToast } from "@/hooks/use-toast";
 import { ButtonLink } from "@/components/ui/button-link";
 import BackgroundSlideshow from "@/components/layout/BackgroundSlideshow";
 import { loginImages } from "@/lib/slideshow-images";
+import { useAuth } from "@/hooks/use-auth";
 
 const Login = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("patient");
   const navigate = useNavigate();
+  const { user } = useAuth();
   
   const [patientEmail, setPatientEmail] = useState("");
   const [patientPassword, setPatientPassword] = useState("");
   const [doctorEmail, setDoctorEmail] = useState("");
   const [doctorPassword, setDoctorPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // If already logged in, redirect to appropriate dashboard
+  if (user) {
+    const userType = user.user_metadata?.user_type || "patient";
+    if (userType === "doctor") {
+      navigate("/doctor-dashboard");
+    } else {
+      navigate("/patient-dashboard");
+    }
+  }
 
   const handlePatientLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,6 +62,7 @@ const Login = () => {
         description: error.message || "Invalid email or password.",
         variant: "destructive",
       });
+      console.error("Login error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -80,6 +94,7 @@ const Login = () => {
         description: error.message || "Invalid email or password.",
         variant: "destructive",
       });
+      console.error("Login error:", error);
     } finally {
       setIsSubmitting(false);
     }
