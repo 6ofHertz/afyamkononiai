@@ -17,6 +17,8 @@ import SymptomChecker from "./pages/SymptomChecker";
 import AIHealthAssistant from "./pages/AIHealthAssistant";
 import NotFound from "./pages/NotFound";
 import { useState } from "react";
+import { ThemeProvider } from "./hooks/use-theme";
+import { AuthProvider } from "./hooks/use-auth";
 
 const App = () => {
   // Create a new QueryClient instance for each component render to avoid React 18 issues
@@ -24,27 +26,31 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/doctors" element={<Doctors />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/patient-dashboard" element={<PatientDashboard />} />
-            <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
-            <Route path="/symptom-checker" element={<SymptomChecker />} />
-            <Route path="/ai-assistant" element={<AIHealthAssistant />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/doctors" element={<Doctors />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/patient-dashboard" element={<PatientDashboard />} />
+                <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+                <Route path="/symptom-checker" element={<SymptomChecker />} />
+                <Route path="/ai-assistant" element={<AIHealthAssistant />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 };
