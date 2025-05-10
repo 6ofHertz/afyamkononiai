@@ -1,6 +1,6 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -16,32 +16,73 @@ import { loginImages } from "@/lib/slideshow-images";
 const Login = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("patient");
+  const navigate = useNavigate();
   
   const [patientEmail, setPatientEmail] = useState("");
   const [patientPassword, setPatientPassword] = useState("");
   const [doctorEmail, setDoctorEmail] = useState("");
   const [doctorPassword, setDoctorPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handlePatientLogin = (e: React.FormEvent) => {
+  const handlePatientLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app we would validate and authenticate
-    toast({
-      title: "Login Successful",
-      description: "Welcome back to AfyaMkononi.",
-    });
-    // Redirect to patient dashboard - this is just a demo
-    window.location.href = "/patient-dashboard";
+    setIsSubmitting(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: patientEmail,
+        password: patientPassword,
+      });
+      
+      if (error) throw error;
+
+      toast({
+        title: "Login Successful",
+        description: "Welcome back to AfyaMkononi.",
+      });
+      
+      // Redirect to patient dashboard
+      navigate("/patient-dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid email or password.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const handleDoctorLogin = (e: React.FormEvent) => {
+  const handleDoctorLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app we would validate and authenticate
-    toast({
-      title: "Login Successful",
-      description: "Welcome back, Doctor.",
-    });
-    // Redirect to doctor dashboard - this is just a demo
-    window.location.href = "/doctor-dashboard";
+    setIsSubmitting(true);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: doctorEmail,
+        password: doctorPassword,
+      });
+      
+      if (error) throw error;
+      
+      // Check if user is a doctor (in a production app, you would verify roles)
+      toast({
+        title: "Login Successful",
+        description: "Welcome back, Doctor.",
+      });
+      
+      // Redirect to doctor dashboard
+      navigate("/doctor-dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message || "Invalid email or password.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -95,8 +136,8 @@ const Login = () => {
                       </div>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-4">
-                      <Button type="submit" className="w-full">
-                        Sign in
+                      <Button type="submit" className="w-full" disabled={isSubmitting}>
+                        {isSubmitting ? "Signing in..." : "Sign in"}
                       </Button>
                       <div className="text-center text-sm">
                         Don&apos;t have an account?{" "}
@@ -147,8 +188,8 @@ const Login = () => {
                       </div>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-4">
-                      <Button type="submit" className="w-full">
-                        Sign in
+                      <Button type="submit" className="w-full" disabled={isSubmitting}>
+                        {isSubmitting ? "Signing in..." : "Sign in"}
                       </Button>
                       <div className="text-center text-sm">
                         Are you a new healthcare provider?{" "}

@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import { useState } from "react";
 import { ThemeProvider } from "./hooks/use-theme";
 import { AuthProvider } from "./hooks/use-auth";
+import RequireAuth from "./components/auth/RequireAuth";
 
 const App = () => {
   // Create a new QueryClient instance for each component render to avoid React 18 issues
@@ -40,8 +41,22 @@ const App = () => {
                 <Route path="/services" element={<Services />} />
                 <Route path="/doctors" element={<Doctors />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/patient-dashboard" element={<PatientDashboard />} />
-                <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+                <Route 
+                  path="/patient-dashboard" 
+                  element={
+                    <RequireAuth>
+                      <PatientDashboard />
+                    </RequireAuth>
+                  } 
+                />
+                <Route 
+                  path="/doctor-dashboard" 
+                  element={
+                    <RequireAuth>
+                      <DoctorDashboard />
+                    </RequireAuth>
+                  } 
+                />
                 <Route path="/symptom-checker" element={<SymptomChecker />} />
                 <Route path="/ai-assistant" element={<AIHealthAssistant />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

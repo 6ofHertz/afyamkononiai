@@ -1,10 +1,12 @@
+
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CalendarIcon, CheckCircle2 } from "lucide-react";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -49,6 +51,7 @@ const formSchema = z.object({
 const Register = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -65,20 +68,33 @@ const Register = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      console.log("Form submitted:", values);
-      
-      toast({
-        title: "Registration successful!",
-        description: "Your account has been created.",
+      // Register with Supabase
+      const { data, error } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        options: {
+          data: {
+            first_name: values.firstName,
+            last_name: values.lastName,
+            user_type: values.userType,
+            date_of_birth: values.dob.toISOString(),
+          }
+        }
       });
       
-      // Redirect would happen here in a real app
-    } catch (error) {
+      if (error) throw error;
+
+      toast({
+        title: "Registration successful!",
+        description: "Your account has been created. You can now log in.",
+      });
+      
+      // Redirect to login
+      navigate("/login");
+    } catch (error: any) {
       toast({
         title: "Registration failed",
-        description: "There was a problem creating your account. Please try again.",
+        description: error.message || "There was a problem creating your account. Please try again.",
         variant: "destructive",
       });
     } finally {

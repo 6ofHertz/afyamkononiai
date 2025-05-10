@@ -1,15 +1,15 @@
 
 import { useState, useEffect, createContext, useContext } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { User as SupabaseUser, Session } from "@supabase/supabase-js";
+import { User, Session } from "@supabase/supabase-js";
 
 // Extend the User type to include avatar_url
-interface User extends SupabaseUser {
+interface ExtendedUser extends User {
   avatar_url?: string;
 }
 
 interface AuthContextProps {
-  user: User | null;
+  user: ExtendedUser | null;
   session: Session | null;
   signOut: () => Promise<void>;
   loading: boolean;
@@ -18,7 +18,7 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<ExtendedUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
-        setUser(session?.user as User | null);
+        setUser(session?.user as ExtendedUser | null);
         setLoading(false);
       }
     );
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setUser(session?.user as User | null);
+      setUser(session?.user as ExtendedUser | null);
       setLoading(false);
     });
 
