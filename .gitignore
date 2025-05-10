@@ -25,3 +25,7 @@ dist-ssr
 *.env
 *.key
 secrets/
+
+.env
+.env.local
+*.env
