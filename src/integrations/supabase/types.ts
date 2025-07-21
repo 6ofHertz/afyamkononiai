@@ -113,24 +113,48 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string | null
+          date_of_birth: string | null
           emergency_contact: string | null
+          employee_id: string | null
+          first_name: string | null
           id: string
+          is_active: boolean | null
           language: string | null
+          last_name: string | null
           notification_preferences: Json | null
+          phone: string | null
+          updated_at: string | null
+          user_role: Database["public"]["Enums"]["user_role"] | null
         }
         Insert: {
           created_at?: string | null
+          date_of_birth?: string | null
           emergency_contact?: string | null
+          employee_id?: string | null
+          first_name?: string | null
           id: string
+          is_active?: boolean | null
           language?: string | null
+          last_name?: string | null
           notification_preferences?: Json | null
+          phone?: string | null
+          updated_at?: string | null
+          user_role?: Database["public"]["Enums"]["user_role"] | null
         }
         Update: {
           created_at?: string | null
+          date_of_birth?: string | null
           emergency_contact?: string | null
+          employee_id?: string | null
+          first_name?: string | null
           id?: string
+          is_active?: boolean | null
           language?: string | null
+          last_name?: string | null
           notification_preferences?: Json | null
+          phone?: string | null
+          updated_at?: string | null
+          user_role?: Database["public"]["Enums"]["user_role"] | null
         }
         Relationships: []
       }
@@ -255,11 +279,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { user_id: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
+      has_role: {
+        Args: {
+          user_id: string
+          role_name: Database["public"]["Enums"]["user_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       reminder_frequency: "once" | "daily" | "weekly" | "monthly"
       reminder_type: "medication" | "appointment" | "other"
+      user_role: "patient" | "doctor" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -389,6 +424,7 @@ export const Constants = {
     Enums: {
       reminder_frequency: ["once", "daily", "weekly", "monthly"],
       reminder_type: ["medication", "appointment", "other"],
+      user_role: ["patient", "doctor", "admin"],
     },
   },
 } as const
