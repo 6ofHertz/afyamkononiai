@@ -28,3 +28,5 @@
 - Use these credentials for testing authentication flows and role-based access
 
 fixed the supabase reg/login bug, today tue 22nd july 14:23
+
+it appears that theres a bug that makes the frontend break, i dunno, bet from the resource-migration.js complication shinanigans wed 22nd july 0:15
