@@ -15,14 +15,17 @@ import DoctorDashboard from "./pages/DoctorDashboard";
 import SymptomChecker from "./pages/SymptomChecker";
 import AIHealthAssistant from "./pages/AIHealthAssistant";
 import NotFound from "./pages/NotFound";
-import AdminDashboard from "./pages/AdminDashboard"; // Import the AdminDashboard component
+import AdminDashboard from "./pages/AdminDashboard";
+import PrivacyPolicy from "./pages/PrivacyPolicy"; // Import PrivacyPolicy component
+import TermsOfService from "./pages/TermsOfService"; // Import TermsOfService component
+import CookiePolicy from "./pages/CookiePolicy"; // Import CookiePolicy component
+import Compliance from "./pages/Compliance"; // Import Compliance component
 import { useState } from "react";
 import { ThemeProvider } from "./hooks/use-theme";
 import { AuthProvider } from "./hooks/use-auth";
 import RequireAuth from "./components/auth/RequireAuth";
 
 const App = () => {
-  // Create a new QueryClient instance for each component render to avoid React 18 issues
   const [queryClient] = useState(() => new QueryClient());
 
   return (
@@ -44,7 +47,7 @@ const App = () => {
                 <Route 
                   path="/patient-dashboard" 
                   element={
-                    <RequireAuth requiredRole="patient">{/* Add requiredRole */}
+                    <RequireAuth requiredRole="patient">
                       <PatientDashboard />
                     </RequireAuth>
                   } 
@@ -52,21 +55,26 @@ const App = () => {
                 <Route 
                   path="/doctor-dashboard" 
                   element={
-                    <RequireAuth requiredRole="doctor">{/* Add requiredRole */}
+                    <RequireAuth requiredRole="doctor">
                       <DoctorDashboard />
                     </RequireAuth>
                   } 
                 />
                 <Route 
-                  path="/admin-dashboard" // Add route for AdminDashboard
+                  path="/admin-dashboard"
                   element={
-                    <RequireAuth requiredRole="admin">{/* Require admin role */}
+                    <RequireAuth requiredRole="admin">
                       <AdminDashboard />
                     </RequireAuth>
                   }
                 />
                 <Route path="/symptom-checker" element={<SymptomChecker />} />
                 <Route path="/ai-assistant" element={<AIHealthAssistant />} />
+                {/* Legal Routes */}
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/cookie-policy" element={<CookiePolicy />} />
+                <Route path="/compliance" element={<Compliance />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

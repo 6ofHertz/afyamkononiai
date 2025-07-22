@@ -2,41 +2,34 @@ import React from 'react';
 
 const Compliance = () => {
   return (
-    <div>
-      <h1>Compliance Statement – AfyaMkononi</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Compliance – AfyaMkononi</h1>
 
-      <p>AfyaMkononi is committed to legal and ethical operation in Kenya, ensuring user trust while complying with:</p>
+      <p className="mb-4">AfyaMkononi is committed to operating in full compliance with all relevant laws and regulations in Kenya, including those related to healthcare, data protection, and consumer rights.</p>
 
-      <h2>Data Protection:</h2>
-      <ul>
-        <li>Kenya Data Protection Act, 2019: https://new.kenyalaw.org/akn/ke/act/2019/24</li>
-        <li>ODPC Guidance Note on Processing of Health Data: https://www.odpc.go.ke/wp-content/uploads/2024/02/ODPC-Guidance-Note-on-Processing-of-Health-Data.pdf</li>
-      </ul>
+      <h2 className="text-2xl font-semibold mb-3">Healthcare Regulations:</h2>
+      <p className="mb-4">We adhere to the guidelines and standards set by the relevant healthcare regulatory bodies in Kenya to ensure the provision of safe and effective teleconsultation services. Our platform is designed to support licensed healthcare professionals in delivering care responsibly.</p>
 
-      <h2>Health Regulations:</h2>
-      <ul>
-        <li>Compliance with the Kenya Medical Practitioners and Dentists Council (KMPDC) telemedicine guidelines: https://kmpdc.go.ke</li>
-      </ul>
+      <h2 className="text-2xl font-semibold mb-3">Data Protection and Privacy:</h2>
+      <p className="mb-4">We comply with the Data Protection Act of Kenya and other applicable data protection laws. Our practices for collecting, processing, storing, and protecting your personal and health information are detailed in our <a href="/privacy" className="text-blue-600 hover:underline">Privacy Policy</a>.</p>
 
-      <h2>Consumer Protection:</h2>
-      <ul>
-        <li>Kenya Consumer Protection Act, 2012: https://www.cak.go.ke/consumer-protection/</li>
-      </ul>
+      <h2 className="text-2xl font-semibold mb-3">Consumer Protection:</h2>
+      <p className="mb-4">We are committed to upholding consumer rights and providing transparent and fair services in accordance with Kenyan consumer protection laws. Our Terms of Service outline the terms of use for our platform.</p>
 
-      <h2>Security Measures:</h2>
-      <ul>
-        <li>Encryption in transit and at rest.</li>
-        <li>Regular security audits.</li>
-        <li>Access control and safe handling of user data.</li>
-      </ul>
+      <h2 className="text-2xl font-semibold mb-3">Professional Licensing and Standards:</h2>
+      <p className="mb-4">All healthcare professionals on the AfyaMkononi platform are required to be appropriately licensed and registered with their respective professional bodies in Kenya. We support their adherence to professional standards and ethical guidelines in the delivery of telehealthcare.</p>
 
-      <h2>User Rights:</h2>
-      <ul>
-        <li>Access, correction, and deletion of personal data upon request.</li>
-        <li>The right to lodge complaints through the ODPC (https://www.odpc.go.ke) or AfyaMkononi’s support channels.</li>
-      </ul>
+      <h2 className="text-2xl font-semibold mb-3">Platform Security:</h2>
+      <p className="mb-4">We maintain robust security measures to protect the integrity and confidentiality of our platform and user data, in line with best practices and regulatory requirements.</p>
 
-      <p>For compliance queries, contact: compliance@afyamkononi.co.ke</p>
+      <h2 className="text-2xl font-semibold mb-3">Reporting Concerns:</h2>
+      <p className="mb-4">If you have any concerns regarding compliance, patient safety, or ethical practices on our platform, please contact us immediately at [Insert Contact Information Here].</p>
+
+      <h2 className="text-2xl font-semibold mb-3">Changes to Compliance Information:</h2>
+      <p className="mb-4">We will update this Compliance page as necessary to reflect any changes in relevant laws or our operational practices.</p>
+
+      <h2 className="text-2xl font-semibold mb-3">Contact Information:</h2>
+      <p className="mb-4">For any questions about our compliance practices, please contact us at [Insert Contact Information Here].</p>
     </div>
   );
 };

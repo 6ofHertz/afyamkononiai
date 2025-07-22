@@ -2,40 +2,37 @@ import React from 'react';
 
 const PrivacyPolicy = () => {
   return (
-    <div>
-      <h1>Privacy Policy – AfyaMkononi</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-6">Privacy Policy – AfyaMkononi</h1>
 
-      <p>AfyaMkononi is committed to protecting your privacy and personal data in compliance with the Kenya Data Protection Act, 2019 (https://new.kenyalaw.org/akn/ke/act/2019/24) and the ODPC Guidance Note on Processing of Health Data (https://www.odpc.go.ke/wp-content/uploads/2024/02/ODPC-Guidance-Note-on-Processing-of-Health-Data.pdf).</p>
+      <p className="mb-4">AfyaMkononi is committed to protecting your privacy and handling your data in compliance with Kenyan data protection laws and healthcare regulations.</p>
 
-      <h2>Data We Collect:</h2>
-      <ul>
-        <li>Personal identifiers (name, email, phone number)</li>
-        <li>Health data (medical history, symptom records, consultation history)</li>
-        <li>Device and usage data (IP address, device type, log data)</li>
-      </ul>
+      <h2 className="text-2xl font-semibold mb-3">Information We Collect:</h2>
+      <p className="mb-4">We collect information necessary for providing our services, including personal identification details, health information (with your explicit consent), contact information, and usage data.</p>
 
-      <h2>Purpose of Data Collection:</h2>
-      <ul>
-        <li>To provide telehealth services and connect patients with licensed healthcare professionals.</li>
-        <li>To improve service delivery and user experience.</li>
-        <li>To ensure safety, quality, and compliance with Kenyan health regulations.</li>
-      </ul>
+      <h2 className="text-2xl font-semibold mb-3">How We Use Your Information:</h2>
+      <p className="mb-4">Your information is used to provide, maintain, and improve our services, facilitate teleconsultations, process payments, communicate with you, and ensure compliance with legal obligations.</p>
 
-      <h2>Data Security:</h2>
-      <ul>
-        <li>Data is encrypted in transit and at rest.</li>
-        <li>Only authorized personnel can access sensitive data.</li>
-        <li>We will notify the Office of the Data Protection Commissioner (ODPC) within 72 hours if a data breach occurs.</li>
-      </ul>
+      <h2 className="text-2xl font-semibold mb-3">Data Sharing and Disclosure:</h2>
+      <p className="mb-4">We do not share your personal health information with third parties without your explicit consent, except as required by law or for the purpose of providing requested services (e.g., with healthcare professionals during a consultation).</p>
 
-      <h2>Your Rights:</h2>
-      <ul>
-        <li>Right to access and correct your personal data.</li>
-        <li>Right to withdraw consent at any time.</li>
-        <li>Right to lodge a complaint with the ODPC if your rights are violated (https://www.odpc.go.ke).</li>
-      </ul>
+      <h2 className="text-2xl font-semibold mb-3">Data Security:</h2>
+      <p className="mb-4">We implement robust security measures to protect your data from unauthorized access, alteration, disclosure, or destruction. This includes encryption, access controls, and regular security audits.</p>
 
-      <p>For privacy concerns, contact: support@afyamkononi.co.ke</p>
+      <h2 className="text-2xl font-semibold mb-3">Data Retention:</h2>
+      <p className="mb-4">We retain your personal information only for as long as necessary to fulfill the purposes for which it was collected and to comply with legal and regulatory requirements.</p>
+
+      <h2 className="text-2xl font-semibold mb-3">Your Rights:</h2>
+      <p className="mb-4">You have the right to access, correct, or request the deletion of your personal data. You can also object to the processing of your data or request restrictions on its use, in accordance with applicable laws.</p>
+
+      <h2 className="text-2xl font-semibold mb-3">Cookies:</h2>
+      <p className="mb-4">We use cookies to enhance your experience on our platform. Please refer to our <a href="/cookie-policy" className="text-blue-600 hover:underline">Cookie Policy</a> for detailed information.</p>
+
+      <h2 className="text-2xl font-semibold mb-3">Changes to this Policy:</h2>
+      <p className="mb-4">We may update this Privacy Policy from time to time. We will notify you of any significant changes by posting the new policy on our website.</p>
+
+      <h2 className="text-2xl font-semibold mb-3">Contact Information:</h2>
+      <p className="mb-4">If you have any questions or concerns about this Privacy Policy or our data practices, please contact us at [Insert Contact Information Here].</p>
     </div>
   );
 };

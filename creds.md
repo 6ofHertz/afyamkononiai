@@ -30,3 +30,7 @@
 fixed the supabase reg/login bug, today tue 22nd july 14:23
 
 it appears that theres a bug that makes the frontend break, i dunno, bet from the resource-migration.js complication shinanigans wed 22nd july 0:15, good thing i dont have to run that akuma again, <evil laughter cat meme>
+
+whilst fxing the legal section, a thought occureed, y not have the page include legal like images, and themes, law, health to show intergration of law and health by our project.... <note to self>
+
+issue 3, goddamn it, the admin dashboard's still waiting for me, am tired
