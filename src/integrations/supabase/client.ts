@@ -8,4 +8,4 @@ const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_MJSNY5BqpBEUw-ufKXx_Mow_Gz2E7iT
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHable_KEY);
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);

@@ -70,16 +70,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   useEffect(() => {
+    console.log('AuthProvider: Initializing auth state...');
+    
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log('AuthProvider: Auth state changed', event, session?.user?.id);
         setSession(session);
         setUser(session?.user as ExtendedUser | null);
         
+        // Defer profile fetching to avoid blocking render
         if (session?.user) {
-          // Fetch profile data when user logs in
-          const profileData = await fetchProfile(session.user.id);
-          setProfile(profileData);
+          setTimeout(async () => {
+            const profileData = await fetchProfile(session.user.id);
+            setProfile(profileData);
+          }, 0);
         } else {
           setProfile(null);
         }
@@ -89,14 +94,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     // Then check for existing session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('AuthProvider: Initial session check', session?.user?.id);
       setSession(session);
       setUser(session?.user as ExtendedUser | null);
       
+      // Defer profile fetching to avoid blocking render
       if (session?.user) {
-        // Fetch profile data for existing session
-        const profileData = await fetchProfile(session.user.id);
-        setProfile(profileData);
+        setTimeout(async () => {
+          const profileData = await fetchProfile(session.user.id);
+          setProfile(profileData);
+        }, 0);
       }
       
       setLoading(false);
