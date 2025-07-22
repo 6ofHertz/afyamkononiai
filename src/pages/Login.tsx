@@ -33,6 +33,8 @@ const Login = () => {
       const userRole = profile.user_role;
       if (userRole === "doctor") {
         navigate("/doctor-dashboard");
+      } else if (userRole === "admin") { // Added condition for admin role
+        navigate("/admin-dashboard"); // Redirect to admin dashboard
       } else {
         navigate("/patient-dashboard");
       }
@@ -57,7 +59,7 @@ const Login = () => {
       });
       
       // Redirect to patient dashboard
-      navigate("/patient-dashboard");
+      // Redirection is now handled by the useEffect hook
     } catch (error: any) {
       toast({
         title: "Login failed",
@@ -101,7 +103,7 @@ const Login = () => {
         
         // For demo, we'll create a temporary session-like behavior
         // In production, this should use proper Supabase authentication
-        navigate("/doctor-dashboard");
+        // Redirection is now handled by the useEffect hook
       } else {
         throw new Error('Invalid password. Please try again.');
       }
