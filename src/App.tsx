@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,7 @@ import DoctorDashboard from "./pages/DoctorDashboard";
 import SymptomChecker from "./pages/SymptomChecker";
 import AIHealthAssistant from "./pages/AIHealthAssistant";
 import NotFound from "./pages/NotFound";
+import AdminDashboard from "./pages/AdminDashboard"; // Import the AdminDashboard component
 import { useState } from "react";
 import { ThemeProvider } from "./hooks/use-theme";
 import { AuthProvider } from "./hooks/use-auth";
@@ -44,7 +44,7 @@ const App = () => {
                 <Route 
                   path="/patient-dashboard" 
                   element={
-                    <RequireAuth>
+                    <RequireAuth requiredRole="patient">{/* Add requiredRole */}
                       <PatientDashboard />
                     </RequireAuth>
                   } 
@@ -52,10 +52,18 @@ const App = () => {
                 <Route 
                   path="/doctor-dashboard" 
                   element={
-                    <RequireAuth>
+                    <RequireAuth requiredRole="doctor">{/* Add requiredRole */}
                       <DoctorDashboard />
                     </RequireAuth>
                   } 
+                />
+                <Route 
+                  path="/admin-dashboard" // Add route for AdminDashboard
+                  element={
+                    <RequireAuth requiredRole="admin">{/* Require admin role */}
+                      <AdminDashboard />
+                    </RequireAuth>
+                  }
                 />
                 <Route path="/symptom-checker" element={<SymptomChecker />} />
                 <Route path="/ai-assistant" element={<AIHealthAssistant />} />
