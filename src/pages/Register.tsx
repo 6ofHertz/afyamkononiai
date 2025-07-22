@@ -39,7 +39,7 @@ const formSchema = z.object({
   lastName: z.string().min(2, { message: "Last name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
   phone: z.string().optional(),
-  password: z.string().min(8, { message: "Password must be at least 8 characters" }),
+  password: z.string().trim().min(8, { message: "Password must be at least 8 characters" }),
   confirmPassword: z.string(),
   dob: z.date({ required_error: "Date of birth is required" }),
   agreeToTerms: z.literal(true, { errorMap: () => ({ message: "You must agree to the terms and conditions" }) }),
