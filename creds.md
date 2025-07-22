@@ -29,4 +29,4 @@
 
 fixed the supabase reg/login bug, today tue 22nd july 14:23
 
-it appears that theres a bug that makes the frontend break, i dunno, bet from the resource-migration.js complication shinanigans wed 22nd july 0:15
+it appears that theres a bug that makes the frontend break, i dunno, bet from the resource-migration.js complication shinanigans wed 22nd july 0:15, good thing i dont have to run that akuma again, <evil laughter cat meme>
