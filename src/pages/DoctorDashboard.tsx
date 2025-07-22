@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { CalendarDays, Clock, Video, FileText, User, Users, Bell, Calendar } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import DoctorAccountSection from "@/components/dashboard/DoctorAccountSection";
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState("today");
@@ -123,36 +124,43 @@ const DoctorDashboard = () => {
           </Card>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-          {/* Left sidebar */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg font-medium">Doctor Profile</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src="/placeholder.svg" alt="Dr. Profile" />
-                    <AvatarFallback>DR</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="font-medium">Dr. Alex Morgan</h3>
-                    <p className="text-sm text-muted-foreground">Pediatrician & Child Health Specialist</p>
-                  </div>
-                </div>
-                
-                <div className="pt-2">
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Profile Completion</span>
-                    <span>85%</span>
-                  </div>
-                  <Progress value={85} className="h-2" />
-                </div>
-                
-                <Button variant="outline" className="w-full">Complete Your Profile</Button>
-              </CardContent>
-            </Card>
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+            <TabsTrigger value="account">Account Settings</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="dashboard" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left sidebar */}
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg font-medium">Doctor Profile</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-16 w-16">
+                        <AvatarImage src="/placeholder.svg" alt="Dr. Profile" />
+                        <AvatarFallback>DR</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <h3 className="font-medium">Dr. Alex Morgan</h3>
+                        <p className="text-sm text-muted-foreground">Pediatrician & Child Health Specialist</p>
+                      </div>
+                    </div>
+                    
+                    <div className="pt-2">
+                      <div className="flex justify-between text-sm mb-1">
+                        <span>Profile Completion</span>
+                        <span>85%</span>
+                      </div>
+                      <Progress value={85} className="h-2" />
+                    </div>
+                    
+                    <Button variant="outline" className="w-full">Complete Your Profile</Button>
+                  </CardContent>
+                </Card>
             
             <Card>
               <CardHeader>
@@ -368,8 +376,14 @@ const DoctorDashboard = () => {
                 </Button>
               </CardContent>
             </Card>
-          </div>
-        </div>
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="account" className="space-y-4">
+            <DoctorAccountSection />
+          </TabsContent>
+        </Tabs>
       </main>
       
       <Footer />
