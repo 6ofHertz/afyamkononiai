@@ -26,3 +26,5 @@
 - Patient accounts can self-register through the registration form
 - Doctor accounts require employee ID during login
 - Use these credentials for testing authentication flows and role-based access
+
+fixed the supabase reg/login bug, today tue 22nd july 14:23
