@@ -13,7 +13,8 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/hooks/use-auth";
 import ResourceGrid from "@/components/dashboard/ResourceGrid";
-import { BookOpen, FileText, Bell, Calendar } from "lucide-react";
+import PatientAccountSection from "@/components/dashboard/PatientAccountSection";
+import { BookOpen, FileText, Bell, Calendar, User } from "lucide-react";
 
 const PatientDashboard = () => {
   const { user, loading } = useAuth();
@@ -67,6 +68,10 @@ const PatientDashboard = () => {
               <TabsTrigger value="notes" className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4" />
                 Notes
+              </TabsTrigger>
+              <TabsTrigger value="account" className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Account
               </TabsTrigger>
             </TabsList>
             
@@ -124,6 +129,10 @@ const PatientDashboard = () => {
                   <p>You haven't created any notes yet.</p>
                 </CardContent>
               </Card>
+            </TabsContent>
+            
+            <TabsContent value="account" className="space-y-4">
+              <PatientAccountSection />
             </TabsContent>
           </Tabs>
         </div>
