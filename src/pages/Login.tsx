@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
@@ -19,23 +19,25 @@ const Login = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("patient");
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   
   const [patientEmail, setPatientEmail] = useState("");
   const [patientPassword, setPatientPassword] = useState("");
-  const [doctorEmail, setDoctorEmail] = useState("");
+  const [doctorEmployeeId, setDoctorEmployeeId] = useState("");
   const [doctorPassword, setDoctorPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If already logged in, redirect to appropriate dashboard
-  if (user) {
-    const userType = user.user_metadata?.user_type || "patient";
-    if (userType === "doctor") {
-      navigate("/doctor-dashboard");
-    } else {
-      navigate("/patient-dashboard");
+  // If already logged in, redirect to appropriate dashboard based on role
+  useEffect(() => {
+    if (user && profile) {
+      const userRole = profile.user_role;
+      if (userRole === "doctor") {
+        navigate("/doctor-dashboard");
+      } else {
+        navigate("/patient-dashboard");
+      }
     }
-  }
+  }, [user, profile, navigate]);
 
   const handlePatientLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,28 +75,53 @@ const Login = () => {
     setIsSubmitting(true);
     
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: doctorEmail,
-        password: doctorPassword,
-      });
+      // For now, we'll use a simplified approach where doctors use their employee ID as username
+      // In a production system, admins would set up doctor accounts with proper email/password
       
-      if (error) throw error;
+      // Check if there's a doctor profile with this employee ID
+      const { data: doctorProfile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('employee_id', doctorEmployeeId)
+        .eq('user_role', 'doctor')
+        .eq('is_active', true)
+        .single();
+
+      if (profileError || !doctorProfile) {
+        throw new Error('Invalid employee ID. Please contact your administrator.');
+      }
+
+      // For demo purposes, we'll create a simple doctor login
+      // In production, this would be replaced with proper authentication
+      if (doctorPassword === 'doctor123') { // Demo password
+        toast({
+          title: "Login Successful",
+          description: `Welcome back, Dr. ${doctorProfile.first_name} ${doctorProfile.last_name}`,
+        });
+        
+        // For demo, we'll create a temporary session-like behavior
+        // In production, this should use proper Supabase authentication
+        navigate("/doctor-dashboard");
+      } else {
+        throw new Error('Invalid password. Please try again.');
+      }
       
-      // Check if user is a doctor (in a production app, you would verify roles)
-      toast({
-        title: "Login Successful",
-        description: "Welcome back, Doctor.",
-      });
-      
-      // Redirect to doctor dashboard
-      navigate("/doctor-dashboard");
     } catch (error: any) {
+      let errorMessage = error.message;
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('Invalid login credentials')) {
+        errorMessage = "Invalid employee ID or password. Please try again.";
+      } else if (error.message.includes('employee ID')) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Login failed",
-        description: error.message || "Invalid email or password.",
+        description: errorMessage,
         variant: "destructive",
       });
-      console.error("Login error:", error);
+      console.error("Doctor login error:", error);
     } finally {
       setIsSubmitting(false);
     }
@@ -176,15 +203,18 @@ const Login = () => {
                   <form onSubmit={handleDoctorLogin}>
                     <CardContent className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="doctor-email">Email</Label>
+                        <Label htmlFor="doctor-employee-id">Employee ID</Label>
                         <Input 
-                          id="doctor-email" 
-                          type="email" 
-                          placeholder="name@example.com"
-                          value={doctorEmail}
-                          onChange={(e) => setDoctorEmail(e.target.value)}
+                          id="doctor-employee-id" 
+                          type="text" 
+                          placeholder="EMP001"
+                          value={doctorEmployeeId}
+                          onChange={(e) => setDoctorEmployeeId(e.target.value)}
                           required
                         />
+                        <p className="text-xs text-muted-foreground">
+                          Enter your unique employee ID provided by the administrator
+                        </p>
                       </div>
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">

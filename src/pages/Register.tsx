@@ -38,10 +38,10 @@ const formSchema = z.object({
   firstName: z.string().min(2, { message: "First name must be at least 2 characters" }),
   lastName: z.string().min(2, { message: "Last name must be at least 2 characters" }),
   email: z.string().email({ message: "Please enter a valid email address" }),
+  phone: z.string().optional(),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
   confirmPassword: z.string(),
   dob: z.date({ required_error: "Date of birth is required" }),
-  userType: z.enum(["patient", "doctor"], { required_error: "Please select a user type" }),
   agreeToTerms: z.literal(true, { errorMap: () => ({ message: "You must agree to the terms and conditions" }) }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
@@ -59,42 +59,57 @@ const Register = () => {
       firstName: "",
       lastName: "",
       email: "",
+      phone: "",
       password: "",
       confirmPassword: "",
-      userType: "patient",
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
-      // Register with Supabase
+      // Register with Supabase and auto-login
       const { data, error } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             first_name: values.firstName,
             last_name: values.lastName,
-            user_type: values.userType,
-            date_of_birth: values.dob.toISOString(),
+            phone: values.phone || '',
+            date_of_birth: values.dob.toISOString().split('T')[0], // Store as date string
+            user_role: 'patient' // All self-registrations are patients
           }
         }
       });
       
       if (error) throw error;
 
-      toast({
-        title: "Registration successful!",
-        description: "Your account has been created. You can now log in.",
-      });
-      
-      // Redirect to login
-      navigate("/login");
+      if (data.user) {
+        toast({
+          title: "Registration successful!",
+          description: "Welcome to AfyaMkononi! You're now logged in.",
+        });
+
+        // Redirect to patient dashboard immediately
+        navigate("/patient-dashboard");
+      }
     } catch (error: any) {
+      let errorMessage = error.message;
+      
+      // Provide user-friendly error messages
+      if (error.message.includes('already registered') || error.message.includes('already exists')) {
+        errorMessage = "An account with this email already exists. Please try logging in instead.";
+      } else if (error.message.includes('Invalid email')) {
+        errorMessage = "Please enter a valid email address.";
+      } else if (error.message.includes('Password')) {
+        errorMessage = "Password must be at least 8 characters long.";
+      }
+
       toast({
         title: "Registration failed",
-        description: error.message || "There was a problem creating your account. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -154,6 +169,20 @@ const Register = () => {
                         <FormLabel>Email</FormLabel>
                         <FormControl>
                           <Input type="email" placeholder="johndoe@example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number (Optional)</FormLabel>
+                        <FormControl>
+                          <Input type="tel" placeholder="+1 (555) 123-4567" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -231,32 +260,6 @@ const Register = () => {
                     )}
                   />
                   
-                  <FormField
-                    control={form.control}
-                    name="userType"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>I am a</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="flex space-x-4"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="patient" id="patient" />
-                              <Label htmlFor="patient">Patient</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="doctor" id="doctor" />
-                              <Label htmlFor="doctor">Doctor</Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
                   
                   <FormField
                     control={form.control}
