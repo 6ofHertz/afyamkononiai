@@ -17,10 +17,12 @@ import { Button } from "@/components/ui/button"; // Import Button component
 interface Resource {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   category: string;
-  url: string;
-  // Add other resource fields as needed
+  url?: string;
+  content?: string;
+  language?: string;
+  created_at?: string;
 }
 
 interface ResourceGridProps {

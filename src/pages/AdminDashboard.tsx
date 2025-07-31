@@ -7,26 +7,31 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/components/ui/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
-import ResourceGrid from '@/components/dashboard/ResourceGrid'; // Import ResourceGrid component
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import ResourceGrid from '@/components/dashboard/ResourceGrid';
 
 interface UserProfile {
   id: string;
-  full_name: string | null;
-  email: string | null;
-  user_role: string | null;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  user_role: "patient" | "doctor" | "admin";
   created_at: string;
-  // Add other profile fields you want to display
+  is_active: boolean;
 }
 
 interface Resource {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   category: string;
-  url: string;
-  // Add other resource fields as needed
+  url?: string;
+  content?: string;
 }
 
 const AdminDashboard = () => {
@@ -41,13 +46,18 @@ const AdminDashboard = () => {
   const [editFormData, setEditFormData] = useState<Partial<UserProfile>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isCreatingUser, setIsCreatingUser] = useState(false);
-  const [newUserFormData, setNewUserFormData] = useState({ email: '', password: '', full_name: '', user_role: 'patient' });
+  const [newUserFormData, setNewUserFormData] = useState({ 
+    email: '', 
+    password: '', 
+    first_name: '', 
+    last_name: '', 
+    user_role: 'patient' as "patient" | "doctor" | "admin"
+  });
   const [isCreating, setIsCreating] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
 
   // Resource Management States
-  const [resources, setResources] = useState<Resource[]>([]); // Keep resources state for potential use or refactoring
-  const [loadingResources, setLoadingResources] = useState(true); // Keep loadingResources state
-  const [resourceError, setResourceError] = useState<string | null>(null); // Keep resourceError state
   const [isCreatingResource, setIsCreatingResource] = useState(false);
   const [newResourceFormData, setNewResourceFormData] = useState({ title: '', description: '', category: '', url: '' });
   const [isSavingResource, setIsSavingResource] = useState(false);
@@ -55,21 +65,49 @@ const AdminDashboard = () => {
   const [isEditingResource, setIsEditingResource] = useState(false);
   const [editResourceFormData, setEditResourceFormData] = useState<Partial<Resource>>({});
   const [isSavingEditedResource, setIsSavingEditedResource] = useState(false);
+  const [resourceError, setResourceError] = useState<string | null>(null);
 
-  // --- User Management Effects and Handlers ---
+  // Metrics States
+  const [metrics, setMetrics] = useState({
+    totalUsers: 0,
+    totalDoctors: 0,
+    totalPatients: 0,
+    totalResources: 0,
+    activeUsers: 0
+  });
 
+  // Fetch Users
   useEffect(() => {
     const fetchUsers = async () => {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, full_name');
+        .select('*');
 
       if (error) {
         setError(error.message);
         setLoading(false);
         console.error('Error fetching users:', error);
       } else {
-        setUsers(data || []);
+        const formattedUsers = data.map(profile => ({
+          id: profile.id,
+          first_name: profile.first_name,
+          last_name: profile.last_name,
+          phone: profile.phone,
+          user_role: profile.user_role,
+          created_at: profile.created_at,
+          is_active: profile.is_active
+        }));
+        setUsers(formattedUsers);
+        
+        // Calculate metrics
+        setMetrics({
+          totalUsers: formattedUsers.length,
+          totalDoctors: formattedUsers.filter(u => u.user_role === 'doctor').length,
+          totalPatients: formattedUsers.filter(u => u.user_role === 'patient').length,
+          totalResources: 0, // Will be updated by ResourceGrid
+          activeUsers: formattedUsers.filter(u => u.is_active).length
+        });
+        
         setLoading(false);
       }
     };
@@ -78,41 +116,21 @@ const AdminDashboard = () => {
   }, []);
 
   const handleUserSelect = async (userId: string) => {
-    setSelectedUser(null);
-    setLoadingUser(true);
-    setUserError(null);
-    setIsEditing(false);
-
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*, auth_users(*)')
-      .eq('id', userId)
-      .single();
-
-    if (error) {
-      setUserError(error.message);
-      setLoadingUser(false);
-      console.error('Error fetching user details:', error);
-    } else {
-      const userProfile: UserProfile = {
-        id: data.id,
-        full_name: data.full_name,
-        user_role: data.user_role,
-        email: data.auth_users?.email || null,
-        created_at: data.auth_users?.created_at || '',
-        // Map other fields as needed
-      };
-      setSelectedUser(userProfile);
-      setEditFormData({ full_name: userProfile.full_name, user_role: userProfile.user_role });
-      setLoadingUser(false);
+    const user = users.find(u => u.id === userId);
+    if (user) {
+      setSelectedUser(user);
+      setEditFormData({
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone: user.phone,
+        user_role: user.user_role,
+        is_active: user.is_active
+      });
     }
   };
 
   const handleEditClick = () => {
     setIsEditing(true);
-    if (selectedUser) {
-      setEditFormData({ full_name: selectedUser.full_name, user_role: selectedUser.user_role });
-    }
   };
 
   const handleCancelClick = () => {
@@ -120,13 +138,8 @@ const AdminDashboard = () => {
     setUserError(null);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { id, value } = e.target;
-    setEditFormData(prevState => ({ ...prevState, [id]: value }));
-  };
-
-  const handleSelectChange = (value: string, fieldId: string) => {
-    setEditFormData(prevState => ({ ...prevState, [fieldId]: value }));
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setEditFormData(prevState => ({ ...prevState, [field]: value }));
   };
 
   const handleSaveClick = async () => {
@@ -135,9 +148,15 @@ const AdminDashboard = () => {
     setIsSaving(true);
     setUserError(null);
 
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('profiles')
-      .update(editFormData)
+      .update({
+        first_name: editFormData.first_name,
+        last_name: editFormData.last_name,
+        phone: editFormData.phone,
+        user_role: editFormData.user_role,
+        is_active: editFormData.is_active
+      })
       .eq('id', selectedUser.id);
 
     if (error) {
@@ -145,14 +164,25 @@ const AdminDashboard = () => {
       console.error('Error updating user profile:', error);
       toast({
         title: "Save failed",
-        description: error.message || "An error occurred while saving.",
+        description: error.message,
         variant: "destructive",
       });
     } else {
-      setSelectedUser(prevState => ({
-        ...prevState!,
-        ...editFormData,
-      }));
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === selectedUser.id 
+            ? { 
+                ...user, 
+                first_name: editFormData.first_name,
+                last_name: editFormData.last_name,
+                phone: editFormData.phone,
+                user_role: editFormData.user_role as "patient" | "doctor" | "admin",
+                is_active: editFormData.is_active ?? user.is_active
+              }
+            : user
+        )
+      );
+      setSelectedUser(prev => prev ? { ...prev, ...editFormData } as UserProfile : null);
       setIsEditing(false);
       toast({
         title: "Save successful",
@@ -163,24 +193,15 @@ const AdminDashboard = () => {
     setIsSaving(false);
   };
 
-  const handleNewUserInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, value } = e.target;
-    setNewUserFormData(prevState => ({ ...prevState, [id]: value }));
-  };
-
-  const handleNewUserSelectChange = (value: string) => {
-    setNewUserFormData(prevState => ({ ...prevState, user_role: value }));
-  };
-
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsCreating(true);
     setUserError(null);
 
-    const { email, password, full_name, user_role } = newUserFormData;
+    const { email, password, first_name, last_name, user_role } = newUserFormData;
 
-    if (!email || !password || !full_name || !user_role) {
-      setUserError("Please fill in all fields.");
+    if (!email || !password || !first_name || !user_role) {
+      setUserError("Please fill in required fields.");
       setIsCreating(false);
       return;
     }
@@ -198,11 +219,12 @@ const AdminDashboard = () => {
       if (newUser) {
         const { error: profileError } = await supabase
           .from('profiles')
-          .insert({
-            id: newUser.id,
-            full_name: full_name,
+          .update({
+            first_name: first_name,
+            last_name: last_name,
             user_role: user_role,
-          });
+          })
+          .eq('id', newUser.id);
 
         if (profileError) throw profileError;
 
@@ -211,25 +233,35 @@ const AdminDashboard = () => {
           description: `New user ${email} created successfully.`,
         });
 
-        setNewUserFormData({ email: '', password: '', full_name: '', user_role: 'patient' });
+        setNewUserFormData({ 
+          email: '', 
+          password: '', 
+          first_name: '', 
+          last_name: '', 
+          user_role: 'patient' 
+        });
         setIsCreatingUser(false);
 
-        const { data: updatedUsers, error: fetchError } = await supabase
-          .from('profiles')
-          .select('id, full_name');
-
-        if (fetchError) {
-          console.error('Error fetching updated users:', fetchError);
-        } else {
-          setUsers(updatedUsers || []);
+        // Refresh users list
+        const { data } = await supabase.from('profiles').select('*');
+        if (data) {
+          const formattedUsers = data.map(profile => ({
+            id: profile.id,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            phone: profile.phone,
+            user_role: profile.user_role,
+            created_at: profile.created_at,
+            is_active: profile.is_active
+          }));
+          setUsers(formattedUsers);
         }
       }
     } catch (error: any) {
-      setUserError(error.message || "An error occurred during user creation.");
-      console.error('User creation error:', error);
+      setUserError(error.message);
       toast({
         title: "User Creation Failed",
-        description: error.message || "An error occurred during user creation.",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -237,65 +269,32 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeleteUser = async () => {
-    if (!selectedUser) return;
+  const handleToggleUserStatus = async (userId: string, newStatus: boolean) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_active: newStatus })
+      .eq('id', userId);
 
-    const isConfirmed = window.confirm(`Are you sure you want to delete user ${selectedUser.email}?`);
-
-    if (isConfirmed) {
-      setUserError(null);
-      setLoadingUser(true);
-
-      try {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .delete()
-          .eq('id', selectedUser.id);
-
-        if (profileError) throw profileError;
-
-        const { error: authError } = await supabase.auth.admin.deleteUser(selectedUser.id);
-
-        if (authError) throw authError;
-
-        toast({
-          title: "User Deleted",
-          description: `User ${selectedUser.email} deleted successfully.`,
-        });
-
-        setSelectedUser(null);
-
-        const { data: updatedUsers, error: fetchError } = await supabase
-          .from('profiles')
-          .select('id, full_name');
-
-        if (fetchError) {
-          console.error('Error fetching updated users:', fetchError);
-        } else {
-          setUsers(updatedUsers || []);
-        }
-      } catch (error: any) {
-        setUserError(error.message || "An error occurred during user deletion.");
-        console.error('User deletion error:', error);
-        toast({
-          title: "User Deletion Failed",
-          description: error.message || "An error occurred during user deletion.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoadingUser(false);
-      }
+    if (error) {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      setUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userId ? { ...user, is_active: newStatus } : user
+        )
+      );
+      toast({
+        title: "User status updated",
+        description: `User ${newStatus ? 'activated' : 'deactivated'} successfully.`,
+      });
     }
   };
 
-  // --- Resource Management Effects and Handlers ---
-
-  // Keep these states and handlers in AdminDashboard for managing the modals
-  const handleNewResourceInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setNewResourceFormData(prevState => ({ ...prevState, [id]: value }));
-  };
-
+  // Resource Management Handlers
   const handleCreateResource = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingResource(true);
@@ -303,17 +302,21 @@ const AdminDashboard = () => {
 
     const { title, description, category, url } = newResourceFormData;
 
-     if (!title || !description || !category || !url) {
-      setResourceError("Please fill in all fields.");
+    if (!title || !description || !category) {
+      setResourceError("Please fill in required fields.");
       setIsSavingResource(false);
       return;
     }
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('resources')
-        .insert([newResourceFormData])
-        .single();
+        .insert([{
+          title,
+          category,
+          content: description,
+          url: url || null
+        }]);
 
       if (error) throw error;
 
@@ -325,14 +328,11 @@ const AdminDashboard = () => {
       setNewResourceFormData({ title: '', description: '', category: '', url: '' });
       setIsCreatingResource(false);
 
-      // No need to refetch resources here, ResourceGrid will handle its own fetching
-
     } catch (error: any) {
-      setResourceError(error.message || "An error occurred during resource creation.");
-      console.error('Resource creation error:', error);
+      setResourceError(error.message);
       toast({
         title: "Resource Creation Failed",
-        description: error.message || "An error occurred during resource creation.",
+        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -340,94 +340,51 @@ const AdminDashboard = () => {
     }
   };
 
-   const handleEditResourceClick = (resource: Resource) => {
+  const handleEditResource = (resource: Resource) => {
     setSelectedResourceForEdit(resource);
-    setEditResourceFormData({ // Initialize form data with selected resource
+    setEditResourceFormData({
       title: resource.title,
-      description: resource.description,
+      description: resource.description || resource.content,
       category: resource.category,
       url: resource.url,
     });
     setIsEditingResource(true);
   };
 
-  const handleEditResourceInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setEditResourceFormData(prevState => ({ ...prevState, [id]: value }));
-  };
-
-   const handleSaveEditedResource = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedResourceForEdit) return;
-
-    setIsSavingEditedResource(true);
-    setResourceError(null); // Clear previous save errors
-
+  const handleDeleteResource = async (resource: Resource) => {
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('resources')
-        .update(editResourceFormData)
-        .eq('id', selectedResourceForEdit.id);
+        .delete()
+        .eq('id', resource.id);
 
       if (error) throw error;
 
       toast({
-        title: "Resource Updated",
-        description: `Resource "${editResourceFormData.title}" updated successfully.`,
+        title: "Resource Deleted",
+        description: `Resource "${resource.title}" deleted successfully.`,
       });
-
-      // Close modal and clear selected resource
-      setIsEditingResource(false);
-      setSelectedResourceForEdit(null);
-      
-      // No need to refetch resources here, ResourceGrid will handle its own fetching
 
     } catch (error: any) {
-      setResourceError(error.message || "An error occurred while saving resource.");
-      console.error('Error saving edited resource:', error);
-       toast({
-        title: "Save failed",
-        description: error.message || "An error occurred while saving.",
+      toast({
+        title: "Deletion Failed",
+        description: error.message,
         variant: "destructive",
       });
-    } finally {
-      setIsSavingEditedResource(false);
     }
-   };
+  };
 
-   const handleDeleteResourceClick = async (resource: Resource) => {
-     const isConfirmed = window.confirm(`Are you sure you want to delete resource "${resource.title}"?`);
-
-     if (isConfirmed) {
-       setResourceError(null); // Clear previous errors
-
-       try {
-         const { error } = await supabase
-           .from('resources')
-           .delete()
-           .eq('id', resource.id);
-
-         if (error) throw error;
-
-         toast({
-           title: "Resource Deleted",
-           description: `Resource "${resource.title}" deleted successfully.`,
-         });
-
-         // No need to refetch resources here, ResourceGrid will handle its own fetching
-
-       } catch (error: any) {
-         setResourceError(error.message || "An error occurred during resource deletion.");
-         console.error('Error deleting resource:', error);
-         toast({
-           title: "Deletion Failed",
-           description: error.message || "An error occurred during deletion.",
-           variant: "destructive",
-         });
-       }
-     }
-   };
-
+  // Filter users based on search and role
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = 
+      (user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+      (user.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+      (user.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+    
+    const matchesRole = roleFilter === "all" || user.user_role === roleFilter;
+    
+    return matchesSearch && matchesRole;
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -436,313 +393,370 @@ const AdminDashboard = () => {
         <div className="container mx-auto px-4">
           <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-          {/* User Management Section */}
-          <h2 className="text-2xl font-semibold mb-4">User Management</h2>
-          <Dialog open={isCreatingUser} onOpenChange={setIsCreatingUser}>
-            <DialogTrigger asChild>
-              <Button className="mb-6">Create New User</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New User</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleCreateUser} className="space-y-4">
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={newUserFormData.email}
-                    onChange={handleNewUserInputChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={newUserFormData.password}
-                    onChange={handleNewUserInputChange}
-                    required
-                  />
-                </div>
-                 <div>
-                  <Label htmlFor="full_name">Full Name</Label>
-                  <Input
-                    id="full_name"
-                    type="text"
-                    value={newUserFormData.full_name}
-                    onChange={handleNewUserInputChange}
-                    required
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="user_role">Role</Label>
-                   <Select onValueChange={handleNewUserSelectChange} value={newUserFormData.user_role}>
-                    <SelectTrigger id="user_role">
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="patient">patient</SelectItem>
-                      <SelectItem value="doctor">doctor</SelectItem>
-                      <SelectItem value="admin">admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                 {userError && <p className="text-red-500 mt-2">Error: {userError}</p>}
-                <Button type="submit" disabled={isCreating}>
-                  {isCreating ? 'Creating...' : 'Create User'}
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-
-          {loading && <p>Loading users...</p>}
-          {error && <p className="text-red-500">Error: {error}</p>}
-
-          {!loading && !error && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-
-                {users.length === 0 ? (
-                  <p>No users found.</p>
-                ) : (
-                  <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-                    <thead>
-                      <tr>
-                        <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 uppercase tracking-wider">ID</th>
-                        <th className="px-6 py-3 border-b-2 border-gray-300 text-left text-sm leading-4 text-gray-600 uppercase tracking-wider">Full Name</th>
-                        {/* Add more table headers for other fields */}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.map((user) => (
-                        <tr
-                          key={user.id}
-                          className="hover:bg-gray-100 cursor-pointer"
-                          onClick={() => handleUserSelect(user.id)}
-                        >
-                          <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{user.id}</td>
-                          <td className="px-6 py-4 whitespace-no-wrap border-b border-gray-200">{user.full_name}</td>
-                          {/* Add more table cells for other fields */}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-
-              {
-                selectedUser && (
-                  <div className="bg-white shadow-md rounded-lg p-6">
-                    <h2 className="text-2xl font-semibold mb-4">User Details</h2>
-                    {loadingUser && <p>Loading user details...</p>}
-                    {userError && <p className="text-red-500">Error: {userError}</p>}
-                    {!loadingUser && !userError && selectedUser && (
-                      <>
-                        {!isEditing ? (
-                          <div>
-                            <p><strong>ID:</strong> {selectedUser.id}</p>
-                            <p><strong>Full Name:</strong> {selectedUser.full_name}</p>
-                            <p><strong>Email:</strong> {selectedUser.email}</p>
-                            <p><strong>Role:</strong> {selectedUser.user_role}</p>
-                            <p><strong>Created At:</strong> {new Date(selectedUser.created_at).toLocaleString()}</p>
-                            {/* Display more user details here */}
-                            <div className="flex space-x-2 mt-4">
-                              <Button onClick={handleEditClick}>Edit User</Button>
-                               <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="destructive">Delete User</Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      This action cannot be undone. This will permanently delete the user account and remove their data from our servers.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={handleDeleteUser}>Delete</AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          </div>
-                        ) : (
-                          <form onSubmit={(e) => { e.preventDefault(); handleSaveClick(); }} className="space-y-4">
-                            <div>
-                              <Label htmlFor="full_name">Full Name</Label>
-                              <Input
-                                id="full_name"
-                                value={editFormData.full_name || ''}
-                                onChange={handleInputChange}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="user_role">Role</Label>
-                              <Select onValueChange={(value) => handleSelectChange(value, 'user_role')} value={editFormData.user_role || ''}>
-                                <SelectTrigger id="user_role">
-                                  <SelectValue placeholder="Select role" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="patient">patient</SelectItem>
-                                  <SelectItem value="doctor">doctor</SelectItem>
-                                  <SelectItem value="admin">admin</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                            {/* Add more fields for editing */}
-                            <div className="flex space-x-2">
-                              <Button type="submit" disabled={isSaving}>
-                                {isSaving ? 'Saving...' : 'Save'}
-                              </Button>
-                              <Button type="button" variant="outline" onClick={handleCancelClick} disabled={isSaving}>Cancel</Button>
-                            </div>
-                             {userError && <p className="text-red-500 mt-2">Error: {userError}</p>}
-                          </form>
-                        )}
-                      </>
-                    )}
-                  </div>
-                )
-              }
-            </div>
-          )}
-
-          {/* Resource Management Section */}
-          <div className="mt-12">
-            <h2 className="text-2xl font-semibold mb-4">Resource Management</h2>
-
-            {/* Create New Resource Button and Modal */}
-            <Dialog open={isCreatingResource} onOpenChange={setIsCreatingResource}>
-              <DialogTrigger asChild>
-                <Button className="mb-6 mr-2">Create New Resource</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Resource</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleCreateResource} className="space-y-4">
-                  <div>
-                    <Label htmlFor="title">Title</Label>
-                    <Input
-                      id="title"
-                      type="text"
-                      value={newResourceFormData.title}
-                      onChange={handleNewResourceInputChange}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Input
-                      id="description"
-                       type="text"
-                      value={newResourceFormData.description}
-                      onChange={handleNewResourceInputChange}
-                      required
-                    />
-                  </div>
-                   <div>
-                    <Label htmlFor="category">Category</Label>
-                    <Input
-                      id="category"
-                       type="text"
-                      value={newResourceFormData.category}
-                      onChange={handleNewResourceInputChange}
-                      required
-                    />
-                  </div>
-                   <div>
-                    <Label htmlFor="url">URL</Label>
-                    <Input
-                      id="url"
-                       type="url"
-                      value={newResourceFormData.url}
-                      onChange={handleNewResourceInputChange}
-                      required
-                    />
-                  </div>
-                   {resourceError && <p className="text-red-500 mt-2">Error: {resourceError}</p>}
-                  <Button type="submit" disabled={isSavingResource}>
-                    {isSavingResource ? 'Creating...' : 'Create Resource'}
-                  </Button>
-                </form>
-              </DialogContent>
-            </Dialog>
-
-            {/* Replace resource table with ResourceGrid */}
-             <ResourceGrid 
-              isAdminView={true} 
-              onEditResource={handleEditResourceClick} 
-              onDeleteResource={handleDeleteResourceClick} 
-            />
-
-            {/* Edit Resource Modal (Keep this for now, we'll integrate it with ResourceGrid actions) */}
-            <Dialog open={isEditingResource} onOpenChange={setIsEditingResource}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Edit Resource</DialogTitle>
-                </DialogHeader>
-                 {selectedResourceForEdit && (
-                  <form onSubmit={handleSaveEditedResource} className="space-y-4">
-                     <div>
-                      <Label htmlFor="title">Title</Label>
-                      <Input
-                        id="title"
-                        type="text"
-                        value={editResourceFormData.title || ''}
-                        onChange={handleEditResourceInputChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="description">Description</Label>
-                      <Input
-                        id="description"
-                         type="text"
-                        value={editResourceFormData.description || ''}
-                        onChange={handleEditResourceInputChange}
-                        required
-                      />
-                    </div>
-                     <div>
-                      <Label htmlFor="category">Category</Label>
-                      <Input
-                        id="category"
-                         type="text"
-                        value={editResourceFormData.category || ''}
-                        onChange={handleEditResourceInputChange}
-                        required
-                      />
-                    </div>
-                     <div>
-                      <Label htmlFor="url">URL</Label>
-                      <Input
-                        id="url"
-                         type="url"
-                        value={editResourceFormData.url || ''}
-                        onChange={handleEditResourceInputChange}
-                        required
-                      />
-                    </div>
-
-                    {resourceError && <p className="text-red-500 mt-2">Error: {resourceError}</p>}
-                    <div className="flex justify-end space-x-2">
-                      <Button type="button" variant="outline" onClick={() => setIsEditingResource(false)} disabled={isSavingEditedResource}>Cancel</Button>
-                      <Button type="submit" disabled={isSavingEditedResource}>
-                        {isSavingEditedResource ? 'Saving...' : 'Save Changes'}
-                      </Button>
-                    </div>
-                  </form>
-                 )}
-              </DialogContent>
-            </Dialog>
-
+          {/* Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics.totalUsers}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics.activeUsers}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Doctors</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics.totalDoctors}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Patients</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics.totalPatients}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Resources</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{metrics.totalResources}</div>
+              </CardContent>
+            </Card>
           </div>
 
+          <Tabs defaultValue="users" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="users">User Management</TabsTrigger>
+              <TabsTrigger value="resources">Resource Management</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="users" className="space-y-6">
+              {/* User Management Section */}
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-semibold">User Management</h2>
+                <Dialog open={isCreatingUser} onOpenChange={setIsCreatingUser}>
+                  <DialogTrigger asChild>
+                    <Button>Create New User</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New User</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateUser} className="space-y-4">
+                      <div>
+                        <Label htmlFor="email">Email *</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={newUserFormData.email}
+                          onChange={(e) => setNewUserFormData(prev => ({ ...prev, email: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="password">Password *</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          value={newUserFormData.password}
+                          onChange={(e) => setNewUserFormData(prev => ({ ...prev, password: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="first_name">First Name *</Label>
+                        <Input
+                          id="first_name"
+                          type="text"
+                          value={newUserFormData.first_name}
+                          onChange={(e) => setNewUserFormData(prev => ({ ...prev, first_name: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="last_name">Last Name</Label>
+                        <Input
+                          id="last_name"
+                          type="text"
+                          value={newUserFormData.last_name}
+                          onChange={(e) => setNewUserFormData(prev => ({ ...prev, last_name: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="user_role">Role *</Label>
+                        <Select 
+                          onValueChange={(value) => setNewUserFormData(prev => ({ ...prev, user_role: value as "patient" | "doctor" | "admin" }))} 
+                          value={newUserFormData.user_role}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="patient">Patient</SelectItem>
+                            <SelectItem value="doctor">Doctor</SelectItem>
+                            <SelectItem value="admin">Admin</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      {userError && <p className="text-red-500 text-sm">{userError}</p>}
+                      <Button type="submit" disabled={isCreating} className="w-full">
+                        {isCreating ? 'Creating...' : 'Create User'}
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              {/* Search and Filter */}
+              <div className="flex gap-4">
+                <Input
+                  placeholder="Search users..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="max-w-sm"
+                />
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Filter by role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Roles</SelectItem>
+                    <SelectItem value="patient">Patients</SelectItem>
+                    <SelectItem value="doctor">Doctors</SelectItem>
+                    <SelectItem value="admin">Admins</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Users Table */}
+              {loading ? (
+                <p>Loading users...</p>
+              ) : error ? (
+                <p className="text-red-500">Error: {error}</p>
+              ) : (
+                <div className="border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Contact</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Created</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUsers.map((user) => (
+                        <TableRow key={user.id}>
+                          <TableCell>{`${user.first_name || ''} ${user.last_name || ''}`}</TableCell>
+                          <TableCell>{user.phone || 'No contact'}</TableCell>
+                          <TableCell>
+                            <Badge variant={user.user_role === 'admin' ? 'default' : user.user_role === 'doctor' ? 'secondary' : 'outline'}>
+                              {user.user_role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={user.is_active ? 'default' : 'destructive'}>
+                              {user.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleUserSelect(user.id)}
+                              >
+                                View
+                              </Button>
+                              <Button
+                                variant={user.is_active ? "destructive" : "default"}
+                                size="sm"
+                                onClick={() => handleToggleUserStatus(user.id, !user.is_active)}
+                              >
+                                {user.is_active ? 'Deactivate' : 'Activate'}
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+
+              {/* User Details Modal */}
+              {selectedUser && (
+                <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>User Details</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      {isEditing ? (
+                        <>
+                          <div>
+                            <Label htmlFor="edit_first_name">First Name</Label>
+                            <Input
+                              id="edit_first_name"
+                              value={editFormData.first_name || ''}
+                              onChange={(e) => handleInputChange('first_name', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="edit_last_name">Last Name</Label>
+                            <Input
+                              id="edit_last_name"
+                              value={editFormData.last_name || ''}
+                              onChange={(e) => handleInputChange('last_name', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="edit_phone">Phone</Label>
+                            <Input
+                              id="edit_phone"
+                              value={editFormData.phone || ''}
+                              onChange={(e) => handleInputChange('phone', e.target.value)}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="edit_role">Role</Label>
+                            <Select 
+                              value={editFormData.user_role} 
+                              onValueChange={(value) => handleInputChange('user_role', value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="patient">Patient</SelectItem>
+                                <SelectItem value="doctor">Doctor</SelectItem>
+                                <SelectItem value="admin">Admin</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button onClick={handleSaveClick} disabled={isSaving}>
+                              {isSaving ? 'Saving...' : 'Save'}
+                            </Button>
+                            <Button variant="outline" onClick={handleCancelClick}>
+                              Cancel
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <Label>Name</Label>
+                            <p>{`${selectedUser.first_name || ''} ${selectedUser.last_name || ''}`}</p>
+                          </div>
+                          <div>
+                            <Label>Phone</Label>
+                            <p>{selectedUser.phone || 'No contact info'}</p>
+                          </div>
+                          <div>
+                            <Label>Role</Label>
+                            <p>{selectedUser.user_role}</p>
+                          </div>
+                          <div>
+                            <Label>Status</Label>
+                            <p>{selectedUser.is_active ? 'Active' : 'Inactive'}</p>
+                          </div>
+                          <div>
+                            <Label>Created</Label>
+                            <p>{new Date(selectedUser.created_at).toLocaleDateString()}</p>
+                          </div>
+                          <Button onClick={handleEditClick}>Edit</Button>
+                        </>
+                      )}
+                      {userError && <p className="text-red-500 text-sm">{userError}</p>}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+            </TabsContent>
+
+            <TabsContent value="resources" className="space-y-6">
+              {/* Resource Management Section */}
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-semibold">Resource Management</h2>
+                <Dialog open={isCreatingResource} onOpenChange={setIsCreatingResource}>
+                  <DialogTrigger asChild>
+                    <Button>Create New Resource</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Create New Resource</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateResource} className="space-y-4">
+                      <div>
+                        <Label htmlFor="title">Title *</Label>
+                        <Input
+                          id="title"
+                          value={newResourceFormData.title}
+                          onChange={(e) => setNewResourceFormData(prev => ({ ...prev, title: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="description">Description *</Label>
+                        <textarea
+                          id="description"
+                          className="w-full min-h-[100px] p-2 border rounded-md"
+                          value={newResourceFormData.description}
+                          onChange={(e) => setNewResourceFormData(prev => ({ ...prev, description: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="category">Category *</Label>
+                        <Input
+                          id="category"
+                          value={newResourceFormData.category}
+                          onChange={(e) => setNewResourceFormData(prev => ({ ...prev, category: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="url">URL (optional)</Label>
+                        <Input
+                          id="url"
+                          type="url"
+                          value={newResourceFormData.url}
+                          onChange={(e) => setNewResourceFormData(prev => ({ ...prev, url: e.target.value }))}
+                        />
+                      </div>
+                      {resourceError && <p className="text-red-500 text-sm">{resourceError}</p>}
+                      <Button type="submit" disabled={isSavingResource} className="w-full">
+                        {isSavingResource ? 'Creating...' : 'Create Resource'}
+                      </Button>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              </div>
+
+              <ResourceGrid 
+                isAdminView={true}
+                onEditResource={handleEditResource}
+                onDeleteResource={handleDeleteResource}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       <Footer />
